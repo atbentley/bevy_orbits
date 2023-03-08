@@ -3,6 +3,7 @@ name = "bevy_mod_orbits"
 version = "0.1.0"
 edition = "2021"
 categories = ["game-development"]
+description = "A bevy plugin for creating stable orbits, and calculating transfers between them"
 keywords = ["bevy", "orbit", "orbital-mechanics"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
