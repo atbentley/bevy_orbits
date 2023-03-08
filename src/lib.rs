@@ -3,7 +3,7 @@ mod math;
 use bevy::prelude::*;
 
 pub mod prelude {
-    pub use super::{Orbit, OrbitPlugin};
+    pub use super::{Mass, Orbit, OrbitPlugin};
 }
 
 pub struct OrbitPlugin;
@@ -25,20 +25,40 @@ pub struct Orbit {
     pub initial_mean_anomaly: f32,
 }
 
-pub fn calculate_orbits(time: Res<Time>, mut query: Query<(&Orbit, &mut Transform)>) {
-    for (orbit, mut transform) in query.iter_mut() {
+#[derive(Component)]
+pub struct Mass {
+    pub mass: f32,
+}
+
+pub fn calculate_orbits(
+    time: Res<Time>,
+    masses: Query<&Mass>,
+    mut orbits: Query<(&Orbit, &mut Transform, Option<&Parent>)>,
+) {
+    for (orbit, mut transform, maybe_parent) in orbits.iter_mut() {
         if orbit.semi_major_axis == 0.0 {
             transform.translation = Vec3::ZERO;
-        } else {
-            let pos = math::calculate_position_at_time(
-                orbit.semi_major_axis,
-                orbit.eccentricity,
-                orbit.argument_of_periapsis,
-                orbit.initial_mean_anomaly,
-                1_000_000_000_000.0,
-                time.elapsed_seconds(),
-            );
-            transform.translation = Vec3::from(pos);
+            continue;
         }
+
+        let Some(parent) = maybe_parent else {
+            transform.translation = Vec3::ZERO;
+            continue;
+        };
+
+        let Some(parent_mass) = masses.get_component::<Mass>(parent.get()).ok() else {
+            warn!("Parent entity {parent:?} is missing Mass component");
+            continue;
+        };
+
+        let pos = math::calculate_position_at_time(
+            orbit.semi_major_axis,
+            orbit.eccentricity,
+            orbit.argument_of_periapsis,
+            orbit.initial_mean_anomaly,
+            parent_mass.mass,
+            time.elapsed_seconds(),
+        );
+        transform.translation = Vec3::from(pos);
     }
 }
