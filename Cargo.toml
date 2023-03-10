@@ -14,3 +14,6 @@ bevy = { version = "0.9", default-features = false }
 
 [dev-dependencies]
 bevy = "0.9"
+bevy_polyline = "0.4"
+bevy_egui = "0.18.0"
+format_num = "0.1.0"

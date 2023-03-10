@@ -3,18 +3,10 @@ use bevy_mod_orbits::prelude::*;
 
 #[bevy_main]
 fn main() {
-    App::new()
-        .add_plugins(DefaultPlugins)
-        .add_plugin(OrbitPlugin)
-        .add_startup_system(startup)
-        .run();
+    App::new().add_plugins(DefaultPlugins).add_plugin(OrbitPlugin).add_startup_system(startup).run();
 }
 
-fn startup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
+fn startup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>) {
     commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(0.0, 10.0, 0.0).looking_at(Vec3::ZERO, Vec3::NEG_Z),
         ..default()

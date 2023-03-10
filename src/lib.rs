@@ -1,4 +1,4 @@
-mod math;
+pub mod math;
 
 use bevy::prelude::*;
 
@@ -17,7 +17,7 @@ impl Plugin for OrbitPlugin {
     }
 }
 
-#[derive(Component)]
+#[derive(Component, Clone)]
 pub struct Orbit {
     pub semi_major_axis: f32,
     pub eccentricity: f32,
