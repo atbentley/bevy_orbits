@@ -36,6 +36,12 @@ pub fn calculate_mean_anomaly(mean_motion: f32, initial_mean_anomaly: f32, time:
 }
 
 #[inline]
+pub fn calculate_initial_mean_anomaly(mean_anomaly: f32, period: f32, time: f32) -> f32 {
+    let mean_motion = calculate_mean_motion(period);
+    (mean_anomaly - mean_motion * time).rem_euclid(TAU)
+}
+
+#[inline]
 pub fn calculate_eccentric_anomaly(eccentricity: f32, mean_anomaly: f32) -> f32 {
     let e = eccentricity;
     let ma = mean_anomaly;
