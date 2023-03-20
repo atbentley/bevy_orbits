@@ -53,7 +53,7 @@ fn startup(
                 material: material.clone(),
                 ..default()
             },
-            Mass { mass: 1e11 },
+            Mass { mass: 1e9 },
         ))
         .id();
 
@@ -114,7 +114,7 @@ impl FromWorld for NextTransfer {
             initial_mean_anomaly: 0.0,
         };
 
-        let transfer = calculate_hohmann_transfer(&initial_orbit, &target_orbit, 1e11, 5.0);
+        let transfer = calculate_transfer(&initial_orbit, &target_orbit, 1e9, 0.0);
         let transfer_orbit = transfer.maneuvers.front().unwrap().target_orbit.clone();
         let target_orbit = transfer.maneuvers.back().unwrap().target_orbit.clone();
 
@@ -149,7 +149,7 @@ impl FromWorld for NextTransfer {
             })
             .id();
         NextTransfer {
-            execution_time: 5.0,
+            execution_time: 0.0,
             transfer,
             transfer_entity,
             target_entity,
@@ -200,7 +200,7 @@ fn ui(
             }
 
             let when = time.elapsed_seconds() + state.execution_time;
-            let transfer = calculate_hohmann_transfer(&initial_orbit, &target_orbit, 1e11, when);
+            let transfer = calculate_transfer(&initial_orbit, &target_orbit, 1e9, when);
             let transfer_orbit = transfer.maneuvers.front().unwrap().target_orbit.clone();
             state.transfer = transfer.clone();
 

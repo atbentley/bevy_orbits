@@ -66,7 +66,7 @@ fn startup(
         initial_mean_anomaly: 0.0,
     };
 
-    let transfer = calculate_hohmann_transfer(&initial_orbit, &target_orbit, 1e11, 2.0);
+    let transfer = calculate_transfer(&initial_orbit, &target_orbit, 1e11, 2.0);
     let transfer_orbit = transfer.maneuvers.front().unwrap().target_orbit.clone();
     let mut schedule = TransferSchedule::default();
     schedule.push_transfer(transfer);

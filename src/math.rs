@@ -55,6 +55,7 @@ pub fn calculate_eccentric_anomaly(eccentricity: f32, mean_anomaly: f32) -> f32 
 
 #[inline]
 pub fn calculate_true_anomaly(eccentricity: f32, eccentric_anomaly: f32) -> f32 {
+    // FIXME: this should return a value in the range of [0, TAU)
     let e = eccentricity;
     let e_a = eccentric_anomaly;
     2.0 * (((1.0 + e) / (1.0 - e) * ((e_a / 2.0).tan()).powi(2)).sqrt()).atan()
