@@ -1,8 +1,8 @@
 use std::f32::consts::TAU;
 
 use bevy::prelude::*;
-use bevy_mod_orbits::math::*;
-use bevy_mod_orbits::prelude::*;
+use bevy_orbits::math::*;
+use bevy_orbits::prelude::*;
 
 #[allow(dead_code)]
 #[derive(Event)]

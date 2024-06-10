@@ -1,7 +1,7 @@
 use std::f32::consts::PI;
 
 pub use bevy::prelude::*;
-pub use bevy_mod_orbits::prelude::Orbit;
+pub use bevy_orbits::prelude::Orbit;
 
 #[allow(unused)]
 pub fn draw_orbit(gizmos: &mut Gizmos, orbit: &Orbit, parent_position: Vec3) {
