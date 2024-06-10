@@ -17,5 +17,5 @@ pub fn draw_orbit(gizmos: &mut Gizmos, orbit: &Orbit, parent_position: Vec3) {
     let ellipse_center_offset = Vec3::new(-(half_size.x.powi(2) - half_size.y.powi(2)).sqrt(), 0.0, 0.0);
     let ellipse_center = parent_position + argument_of_periapsis_rotation * ellipse_center_offset;
 
-    gizmos.ellipse(ellipse_center, final_rotation, half_size, Color::WHITE).segments(64);
+    gizmos.ellipse(ellipse_center, final_rotation, half_size, Color::WHITE).resolution(64);
 }

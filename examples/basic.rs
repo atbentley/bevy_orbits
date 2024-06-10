@@ -15,7 +15,7 @@ fn startup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materia
     let mesh = meshes.add(Sphere::new(0.45));
 
     let material = materials.add(StandardMaterial {
-        base_color: Color::rgb(0.7, 0.3, 0.3),
+        base_color: Color::srgb(0.7, 0.3, 0.3),
         unlit: true,
         ..default()
     });
