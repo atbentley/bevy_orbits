@@ -3,28 +3,21 @@ mod utils;
 use std::f32::consts::TAU;
 
 use bevy::prelude::*;
-use bevy::{ecs::change_detection::DetectChanges, utils::HashMap};
 use bevy_egui::egui::Ui;
-use bevy_egui::{egui, EguiContext, EguiPlugin};
+use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use bevy_mod_orbits::prelude::*;
-use bevy_polyline::prelude::*;
 use format_num::format_num;
 
-use utils::{dejitter_orbit, draw_ellipse, MassChanged, OrbitChanged};
+use utils::{dejitter_orbit, draw_orbit, MassChanged, OrbitChanged};
 
 #[bevy_main]
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
-        .add_plugin(PolylinePlugin)
-        .add_plugin(OrbitPlugin)
-        .add_plugin(EguiPlugin)
+        .add_plugins((DefaultPlugins, OrbitPlugin, EguiPlugin))
         .add_event::<MassChanged>()
         .add_event::<OrbitChanged>()
-        .add_startup_system(startup)
-        .add_system(ui)
-        .add_system(dejitter_orbit.after(ui))
-        .add_system(draw_orbit.after(dejitter_orbit))
+        .add_systems(Startup, startup)
+        .add_systems(Update, (ui, dejitter_orbit, draw_orbits).chain())
         .run();
 }
 
@@ -38,13 +31,7 @@ fn startup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materia
         .spawn((
             Sun,
             PbrBundle {
-                mesh: meshes.add(
-                    shape::Icosphere {
-                        radius: 0.45,
-                        subdivisions: 32,
-                    }
-                    .into(),
-                ),
+                mesh: meshes.add(Sphere::new(0.45)),
                 material: materials.add(StandardMaterial {
                     base_color: Color::rgb(0.7, 0.3, 0.3),
                     unlit: true,
@@ -60,13 +47,7 @@ fn startup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materia
         .spawn((
             Earth,
             PbrBundle {
-                mesh: meshes.add(
-                    shape::Icosphere {
-                        radius: 0.2,
-                        subdivisions: 32,
-                    }
-                    .into(),
-                ),
+                mesh: meshes.add(Sphere::new(0.2)),
                 material: materials.add(StandardMaterial {
                     base_color: Color::rgb(0.7, 0.3, 0.3),
                     unlit: true,
@@ -89,13 +70,7 @@ fn startup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materia
         .spawn((
             Moon,
             PbrBundle {
-                mesh: meshes.add(
-                    shape::Icosphere {
-                        radius: 0.1,
-                        subdivisions: 32,
-                    }
-                    .into(),
-                ),
+                mesh: meshes.add(Sphere::new(0.1)),
                 material: materials.add(StandardMaterial {
                     base_color: Color::rgb(0.7, 0.3, 0.3),
                     unlit: true,
@@ -123,7 +98,7 @@ struct Earth;
 struct Moon;
 
 fn ui(
-    mut egui_context: ResMut<EguiContext>,
+    mut egui_contexts: EguiContexts,
     mut queries: ParamSet<(
         Query<(Entity, &mut Mass), With<Sun>>,
         Query<(Entity, &mut Orbit, &mut Mass), With<Earth>>,
@@ -177,7 +152,7 @@ fn ui(
         }
     };
 
-    egui::Window::new("Parameters").show(egui_context.ctx_mut(), |ui| {
+    egui::Window::new("Parameters").resizable(false).show(egui_contexts.ctx_mut(), |ui| {
         ui.heading("Sun");
         let mut suns = queries.p0();
         let (entity, mut mass) = suns.single_mut();
@@ -198,53 +173,13 @@ fn ui(
     });
 }
 
-#[derive(Default)]
-pub struct DrawState {
-    polylines_for_orbits: HashMap<Entity, Entity>,
-}
+pub fn draw_orbits(mut gizmos: Gizmos, orbits: Query<(&Orbit, &GlobalTransform, Option<&Parent>)>) {
+    for (orbit, _, maybe_parent) in &orbits {
+        let parent_position = maybe_parent
+            .and_then(|parent| orbits.get(parent.get()).ok())
+            .map(|(_, parent_transform, _)| parent_transform.translation())
+            .unwrap_or(Vec3::ZERO);
 
-pub fn draw_orbit(
-    mut state: Local<DrawState>,
-    mut commands: Commands,
-    mut polylines: ResMut<Assets<Polyline>>,
-    mut materials: ResMut<Assets<PolylineMaterial>>,
-    added_orbits: Query<(Entity, &Orbit, Option<&Parent>), Added<Orbit>>,
-    changed_orbits: Query<(Entity, &Orbit), Changed<Orbit>>,
-    polyline_handles: Query<&Handle<Polyline>>,
-) {
-    for (orbit_entity, orbit, maybe_parent) in &added_orbits {
-        let mut polyline = Polyline::default();
-        draw_ellipse(orbit, &mut polyline);
-        let mut builder = commands.spawn(PolylineBundle {
-            polyline: polylines.add(polyline),
-            material: materials.add(PolylineMaterial {
-                width: 1.0,
-                ..default()
-            }),
-            ..default()
-        });
-
-        if let Some(parent) = maybe_parent {
-            builder.set_parent(parent.get());
-        }
-
-        let polyline_entity = builder.id();
-        state.polylines_for_orbits.insert(orbit_entity, polyline_entity);
-    }
-
-    for (orbit_entity, orbit) in &changed_orbits {
-        let Some(polyline_entity) = state.polylines_for_orbits.get(&orbit_entity) else {
-            continue;
-        };
-
-        let Some(polyline_handle) = polyline_handles.get(*polyline_entity).ok() else {
-            continue;
-        };
-
-        let Some(polyline) = polylines.get_mut(polyline_handle) else {
-            continue;
-        };
-
-        draw_ellipse(orbit, polyline);
+        draw_orbit(&mut gizmos, &orbit, parent_position);
     }
 }
