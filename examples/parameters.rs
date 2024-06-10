@@ -33,7 +33,7 @@ fn startup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materia
             PbrBundle {
                 mesh: meshes.add(Sphere::new(0.45)),
                 material: materials.add(StandardMaterial {
-                    base_color: Color::rgb(0.7, 0.3, 0.3),
+                    base_color: Color::srgb(0.7, 0.3, 0.3),
                     unlit: true,
                     ..default()
                 }),
@@ -49,7 +49,7 @@ fn startup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materia
             PbrBundle {
                 mesh: meshes.add(Sphere::new(0.2)),
                 material: materials.add(StandardMaterial {
-                    base_color: Color::rgb(0.7, 0.3, 0.3),
+                    base_color: Color::srgb(0.7, 0.3, 0.3),
                     unlit: true,
                     ..default()
                 }),
@@ -72,7 +72,7 @@ fn startup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materia
             PbrBundle {
                 mesh: meshes.add(Sphere::new(0.1)),
                 material: materials.add(StandardMaterial {
-                    base_color: Color::rgb(0.7, 0.3, 0.3),
+                    base_color: Color::srgb(0.7, 0.3, 0.3),
                     unlit: true,
                     ..default()
                 }),

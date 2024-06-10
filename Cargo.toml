@@ -10,9 +10,9 @@ readme = "README.md"
 repository = "https://github.com/atbentley/bevy_mod_orbits"
 
 [dependencies]
-bevy = { version = "0.13.2", default-features = false }
+bevy = { version = "0.14.0-rc.2", default-features = false }
 
 [dev-dependencies]
-bevy = "0.13.2"
-bevy_egui = "0.27.0"
+bevy = "0.14.0-rc.2"
+bevy_egui = { git = "https://github.com/Friz64/bevy_egui", rev = "421f7375e9fbb62d8facb0259b9549cdc82995e5" }
 format_num = "0.1.0"

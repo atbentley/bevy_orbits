@@ -20,11 +20,7 @@ pub struct Orbits {
     target: Orbit,
 }
 
-fn startup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
+fn startup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>) {
     commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(0.0, 10.0, 0.0).looking_at(Vec3::ZERO, Vec3::NEG_Z),
         ..default()
@@ -33,7 +29,7 @@ fn startup(
     let mesh = meshes.add(Sphere::new(0.2));
 
     let material = materials.add(StandardMaterial {
-        base_color: Color::rgb(0.7, 0.3, 0.3),
+        base_color: Color::srgb(0.7, 0.3, 0.3),
         unlit: true,
         ..default()
     });
