@@ -2,38 +2,35 @@ mod utils;
 
 use bevy::prelude::*;
 use bevy_mod_orbits::prelude::*;
-use bevy_polyline::prelude::*;
-use utils::draw_ellipse;
+use utils::draw_orbit;
 
 #[bevy_main]
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
-        .add_plugin(PolylinePlugin)
-        .add_plugin(OrbitPlugin)
-        .add_startup_system(startup)
+        .add_plugins((DefaultPlugins, OrbitPlugin))
+        .add_systems(Startup, startup)
+        .add_systems(Update, draw_orbits)
         .run();
+}
+
+#[derive(Resource)]
+pub struct Orbits {
+    start: Orbit,
+    transfer: Orbit,
+    target: Orbit,
 }
 
 fn startup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut polylines: ResMut<Assets<Polyline>>,
-    mut polyline_materials: ResMut<Assets<PolylineMaterial>>,
 ) {
     commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(0.0, 10.0, 0.0).looking_at(Vec3::ZERO, Vec3::NEG_Z),
         ..default()
     });
 
-    let mesh = meshes.add(
-        shape::Icosphere {
-            radius: 0.2,
-            subdivisions: 32,
-        }
-        .into(),
-    );
+    let mesh = meshes.add(Sphere::new(0.2));
 
     let material = materials.add(StandardMaterial {
         base_color: Color::rgb(0.7, 0.3, 0.3),
@@ -83,40 +80,16 @@ fn startup(
         ))
         .set_parent(sun);
 
-    // Visualise the initial and target orbit
-    let mut initial_polyline = Polyline::default();
-    draw_ellipse(&initial_orbit, &mut initial_polyline);
-    commands.spawn(PolylineBundle {
-        polyline: polylines.add(initial_polyline),
-        material: polyline_materials.add(PolylineMaterial {
-            width: 1.0,
-            color: Color::WHITE,
-            ..default()
-        }),
-        ..default()
-    });
+    let orbits = Orbits {
+        start: initial_orbit,
+        transfer: transfer_orbit,
+        target: target_orbit,
+    };
+    commands.insert_resource(orbits);
+}
 
-    let mut target_polyline = Polyline::default();
-    draw_ellipse(&target_orbit, &mut target_polyline);
-    commands.spawn(PolylineBundle {
-        polyline: polylines.add(target_polyline),
-        material: polyline_materials.add(PolylineMaterial {
-            width: 1.0,
-            color: Color::WHITE,
-            ..default()
-        }),
-        ..default()
-    });
-
-    let mut transfer_polyline = Polyline::default();
-    draw_ellipse(&transfer_orbit, &mut transfer_polyline);
-    commands.spawn(PolylineBundle {
-        polyline: polylines.add(transfer_polyline),
-        material: polyline_materials.add(PolylineMaterial {
-            width: 1.0,
-            color: Color::WHITE,
-            ..default()
-        }),
-        ..default()
-    });
+pub fn draw_orbits(mut gizmos: Gizmos, orbits: Res<Orbits>) {
+    draw_orbit(&mut gizmos, &orbits.start, Vec3::ZERO);
+    draw_orbit(&mut gizmos, &orbits.transfer, Vec3::ZERO);
+    draw_orbit(&mut gizmos, &orbits.target, Vec3::ZERO);
 }

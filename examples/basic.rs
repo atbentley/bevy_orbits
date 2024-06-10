@@ -3,7 +3,7 @@ use bevy_mod_orbits::prelude::*;
 
 #[bevy_main]
 fn main() {
-    App::new().add_plugins(DefaultPlugins).add_plugin(OrbitPlugin).add_startup_system(startup).run();
+    App::new().add_plugins((DefaultPlugins, OrbitPlugin)).add_systems(Startup, startup).run();
 }
 
 fn startup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<StandardMaterial>>) {
@@ -12,13 +12,7 @@ fn startup(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>, mut materia
         ..default()
     });
 
-    let mesh = meshes.add(
-        shape::Icosphere {
-            radius: 0.45,
-            subdivisions: 32,
-        }
-        .into(),
-    );
+    let mesh = meshes.add(Sphere::new(0.45));
 
     let material = materials.add(StandardMaterial {
         base_color: Color::rgb(0.7, 0.3, 0.3),

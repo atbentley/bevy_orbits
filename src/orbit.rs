@@ -29,7 +29,7 @@ pub fn calculate_orbits(
             continue;
         };
 
-        let Some(parent_mass) = masses.get_component::<Mass>(parent.get()).ok() else {
+        let Ok(parent_mass) = masses.get(parent.get()) else {
             warn!("Parent entity {parent:?} is missing Mass component");
             continue;
         };

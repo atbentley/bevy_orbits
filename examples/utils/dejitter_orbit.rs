@@ -5,6 +5,7 @@ use bevy_mod_orbits::math::*;
 use bevy_mod_orbits::prelude::*;
 
 #[allow(dead_code)]
+#[derive(Event)]
 pub struct OrbitChanged {
     pub entity: Entity,
     pub old_orbit: Orbit,
@@ -12,6 +13,7 @@ pub struct OrbitChanged {
 }
 
 #[allow(dead_code)]
+#[derive(Event)]
 pub struct MassChanged {
     pub entity: Entity,
     pub old_mass: f32,
@@ -31,10 +33,14 @@ pub fn dejitter_orbit(
     childrens: Query<&Children>,
     time: Res<Time>,
 ) {
-    for change in changed_masses.iter() {
-        let Some(children) = childrens.get(change.entity).ok() else { continue; };
+    for change in changed_masses.read() {
+        let Ok(children) = childrens.get(change.entity) else {
+            continue;
+        };
         for child_entity in children {
-            let Some(mut orbit) = orbits.get_mut(*child_entity).ok() else { continue; };
+            let Ok(mut orbit) = orbits.get_mut(*child_entity) else {
+                continue;
+            };
             let new_initial_mean_anomaly = calculate_initial_mean_anomaly(
                 orbit.semi_major_axis,
                 orbit.initial_mean_anomaly,
@@ -48,10 +54,16 @@ pub fn dejitter_orbit(
         }
     }
 
-    for change in changed_orbits.iter() {
-        let Some(parent_entity) = parents.get(change.entity).ok() else { continue; };
-        let Some(parent_mass) = masses.get(parent_entity.get()).ok() else { continue; };
-        let Some(mut orbit) = orbits.get_mut(change.entity).ok() else { continue; };
+    for change in changed_orbits.read() {
+        let Ok(parent_entity) = parents.get(change.entity) else {
+            continue;
+        };
+        let Ok(parent_mass) = masses.get(parent_entity.get()) else {
+            continue;
+        };
+        let Ok(mut orbit) = orbits.get_mut(change.entity) else {
+            continue;
+        };
         let new_initial_mean_anomaly = calculate_initial_mean_anomaly(
             change.old_orbit.semi_major_axis,
             change.old_orbit.initial_mean_anomaly,

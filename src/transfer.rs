@@ -29,8 +29,8 @@ impl TransferSchedule {
     }
 
     fn overdue_maneuver(&mut self, seconds: f32) -> Option<Maneuver> {
-        let Some(next_transfer) = self.transfers.front_mut() else { return None };
-        let Some(maybe_next_maneuver) = next_transfer.maneuvers.front() else { return None };
+        let next_transfer = self.transfers.front_mut()?;
+        let maybe_next_maneuver = next_transfer.maneuvers.front()?;
 
         if seconds < maybe_next_maneuver.execution_time {
             return None;
