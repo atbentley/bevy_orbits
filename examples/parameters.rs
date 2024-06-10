@@ -5,7 +5,7 @@ use std::f32::consts::TAU;
 use bevy::prelude::*;
 use bevy_egui::egui::Ui;
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
-use bevy_mod_orbits::prelude::*;
+use bevy_orbits::prelude::*;
 use format_num::format_num;
 
 use utils::{dejitter_orbit, draw_orbit, MassChanged, OrbitChanged};

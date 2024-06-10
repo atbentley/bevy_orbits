@@ -1,7 +1,7 @@
 mod utils;
 
 use bevy::prelude::*;
-use bevy_mod_orbits::prelude::*;
+use bevy_orbits::prelude::*;
 use utils::draw_orbit;
 
 #[bevy_main]

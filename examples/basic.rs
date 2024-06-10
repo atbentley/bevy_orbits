@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_mod_orbits::prelude::*;
+use bevy_orbits::prelude::*;
 
 #[bevy_main]
 fn main() {
